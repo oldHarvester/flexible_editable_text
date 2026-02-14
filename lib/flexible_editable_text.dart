@@ -32,7 +32,7 @@ class FlexibleEditableText extends InputBuilder {
     this.textCapitalization = TextCapitalization.none,
     TextInputType? keyboardType,
     this.strutStyle,
-    this.autofocus = true,
+    this.autofocus = false,
     this.textDirection,
     this.obscuringCharacter = '•',
     this.obscureText = false,

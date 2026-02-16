@@ -116,6 +116,7 @@ class FlexibleEditableText extends InputBuilder {
     this.textWidthBasis = TextWidthBasis.parent,
     this.contextMenuBuilder = _defaultContextMenuBuilder,
     this.scrollPhysics,
+    this.debug = false,
     this.unfocusOnTapOutside = true,
     this.scrollPadding = const EdgeInsets.all(20.0),
   })  : assert(obscuringCharacter.length == 1),
@@ -227,6 +228,7 @@ class FlexibleEditableText extends InputBuilder {
   final Widget Function(BuildContext context, Widget editableText)?
       gestureDetectorBuilder;
   final bool unfocusOnTapOutside;
+  final bool debug;
 
   bool get selectionEnabled => enableInteractiveSelection;
 
@@ -253,6 +255,10 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
   late _FlexibleEditableTextGestureDetectorBuilder
       _selectionGestureDetectorBuilder;
   late final ValueNotifier<bool> _isEmpty;
+  late final CustomLogger _logger = CustomLogger(
+    owner: runtimeType.toString(),
+    showLogs: widget.debug,
+  );
 
   @override
   void initState() {
@@ -272,6 +278,10 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
 
   void _updateCanRequest() {
     focusNode.canRequestFocus = _canRequestFocus;
+  }
+
+  void log(Object object) {
+    _logger.log(object);
   }
 
   @override
@@ -417,11 +427,13 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
 
   void _handleSelectionHandleTapped() {
     if (controller.selection.isCollapsed) {
+      log('toggle toolbar');
       _editableText!.toggleToolbar();
     }
   }
 
   void _requestKeyboard() {
+    log('request keyboard');
     _editableText?.requestKeyboard();
   }
 
@@ -627,6 +639,7 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
                               handleDidLoseAccessibilityFocus,
                           onFocus: enabled
                               ? () {
+                                log('on focus start');
                                   assert(
                                     focusNode.canRequestFocus,
                                     'Received SemanticsAction.focus from the engine. However, the FocusNode '
@@ -638,6 +651,7 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
 
                                   if (focusNode.canRequestFocus &&
                                       !focusNode.hasFocus) {
+                                    log('request focus');
                                     focusNode.requestFocus();
                                   } else if (!widget.readOnly) {
                                     // If the platform requested focus, that means that previously the

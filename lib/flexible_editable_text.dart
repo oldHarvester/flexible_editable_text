@@ -9,6 +9,34 @@ import 'package:flutter_toolkit/flutter_toolkit.dart';
 
 part 'gesture_builder.dart';
 
+class CustomCupertinoTextSelectionControls
+    extends CupertinoTextSelectionControls {
+  CustomCupertinoTextSelectionControls({
+    required this.handleColor,
+  });
+
+  final Color? handleColor;
+
+  @override
+  Widget buildHandle(
+    BuildContext context,
+    TextSelectionHandleType type,
+    double textLineHeight, [
+    VoidCallback? onTap,
+  ]) {
+    final handleColor = this.handleColor;
+    final child = super.buildHandle(context, type, textLineHeight, onTap);
+    if (handleColor != null) {
+      return ColorFiltered(
+        colorFilter: ColorFilter.mode(handleColor, BlendMode.srcIn),
+        child: child,
+      );
+    } else {
+      return child;
+    }
+  }
+}
+
 class FlexibleEditableText extends InputBuilder {
   const FlexibleEditableText({
     super.key,
@@ -76,6 +104,7 @@ class FlexibleEditableText extends InputBuilder {
     this.magnifierConfiguration,
     this.onTapOutside,
     this.onTapUpOutside,
+    this.selectionHandleColor,
     this.hintStyle,
     this.style,
     this.hintText,
@@ -89,43 +118,40 @@ class FlexibleEditableText extends InputBuilder {
     this.scrollPhysics,
     this.unfocusOnTapOutside = true,
     this.scrollPadding = const EdgeInsets.all(20.0),
-  }) : assert(obscuringCharacter.length == 1),
-       smartDashesType =
-           smartDashesType ??
-           (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
-       smartQuotesType =
-           smartQuotesType ??
-           (obscureText ? SmartQuotesType.disabled : SmartQuotesType.enabled),
-       assert(maxLines == null || maxLines > 0),
-       assert(minLines == null || minLines > 0),
-       assert(
-         (maxLines == null) || (minLines == null) || (maxLines >= minLines),
-         "minLines can't be greater than maxLines",
-       ),
-       assert(
-         !expands || (maxLines == null && minLines == null),
-         'minLines and maxLines must be null when expands is true.',
-       ),
-       assert(
-         !obscureText || maxLines == 1,
-         'Obscured fields cannot be multiline.',
-       ),
-       assert(
-         maxLength == null ||
-             maxLength == TextField.noMaxLength ||
-             maxLength > 0,
-       ),
-       assert(
-         !identical(textInputAction, TextInputAction.newline) ||
-             maxLines == 1 ||
-             !identical(keyboardType, TextInputType.text),
-         'Use keyboardType TextInputType.multiline when using TextInputAction.newline on a multiline TextField.',
-       ),
-       keyboardType =
-           keyboardType ??
-           (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
-       enableInteractiveSelection =
-           enableInteractiveSelection ?? (!readOnly || !obscureText);
+  })  : assert(obscuringCharacter.length == 1),
+        smartDashesType = smartDashesType ??
+            (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
+        smartQuotesType = smartQuotesType ??
+            (obscureText ? SmartQuotesType.disabled : SmartQuotesType.enabled),
+        assert(maxLines == null || maxLines > 0),
+        assert(minLines == null || minLines > 0),
+        assert(
+          (maxLines == null) || (minLines == null) || (maxLines >= minLines),
+          "minLines can't be greater than maxLines",
+        ),
+        assert(
+          !expands || (maxLines == null && minLines == null),
+          'minLines and maxLines must be null when expands is true.',
+        ),
+        assert(
+          !obscureText || maxLines == 1,
+          'Obscured fields cannot be multiline.',
+        ),
+        assert(
+          maxLength == null ||
+              maxLength == TextField.noMaxLength ||
+              maxLength > 0,
+        ),
+        assert(
+          !identical(textInputAction, TextInputAction.newline) ||
+              maxLines == 1 ||
+              !identical(keyboardType, TextInputType.text),
+          'Use keyboardType TextInputType.multiline when using TextInputAction.newline on a multiline TextField.',
+        ),
+        keyboardType = keyboardType ??
+            (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
+        enableInteractiveSelection =
+            enableInteractiveSelection ?? (!readOnly || !obscureText);
 
   final String? hintText;
   final TextStyle? hintStyle;
@@ -140,6 +166,7 @@ class FlexibleEditableText extends InputBuilder {
   final VoidCallback? onTap;
   final bool readOnly;
   final bool? showCursor;
+  final Color? selectionHandleColor;
   final UndoHistoryController? undoController;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
@@ -198,7 +225,7 @@ class FlexibleEditableText extends InputBuilder {
   final TextWidthBasis textWidthBasis;
   final HitTestBehavior? selectionHitTestBehaviour;
   final Widget Function(BuildContext context, Widget editableText)?
-  gestureDetectorBuilder;
+      gestureDetectorBuilder;
   final bool unfocusOnTapOutside;
 
   bool get selectionEnabled => enableInteractiveSelection;
@@ -224,7 +251,7 @@ class FlexibleEditableText extends InputBuilder {
 class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
     implements TextSelectionGestureDetectorBuilderDelegate, AutofillClient {
   late _FlexibleEditableTextGestureDetectorBuilder
-  _selectionGestureDetectorBuilder;
+      _selectionGestureDetectorBuilder;
   late final ValueNotifier<bool> _isEmpty;
 
   @override
@@ -232,8 +259,8 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
     super.initState();
     _selectionGestureDetectorBuilder =
         _FlexibleEditableTextGestureDetectorBuilder(
-          state: this,
-        );
+      state: this,
+    );
     _isEmpty = ValueNotifier(controller.text.isEmpty);
   }
 
@@ -449,8 +476,8 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
       case TargetPlatform.macOS:
         spellCheckConfiguration =
             CupertinoTextField.inferIOSSpellCheckConfiguration(
-              widget.spellCheckConfiguration,
-            );
+          widget.spellCheckConfiguration,
+        );
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
       case TargetPlatform.linux:
@@ -464,7 +491,9 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
       case TargetPlatform.iOS:
         forcePressEnabled = true;
         cursorOpacityAnimates ??= true;
-        textSelectionControls ??= cupertinoTextSelectionHandleControls;
+        textSelectionControls ??= CustomCupertinoTextSelectionControls(
+          handleColor: widget.selectionHandleColor,
+        );
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
           iOSHorizontalOffset / MediaQuery.devicePixelRatioOf(context),
@@ -587,8 +616,8 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
                                   if (!controller.selection.isValid) {
                                     controller.selection =
                                         TextSelection.collapsed(
-                                          offset: controller.text.length,
-                                        );
+                                      offset: controller.text.length,
+                                    );
                                   }
                                   _requestKeyboard();
                                 },
@@ -655,14 +684,13 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
                             minLines: widget.minLines,
                             expands: widget.expands,
                             selectionColor: hasFocus ? selectionColor : null,
-                            selectionControls: selectionEnabled
-                                ? textSelectionControls
-                                : null,
+                            selectionControls:
+                                selectionEnabled ? textSelectionControls : null,
                             onEditingComplete: widget.onEditingComplete == null
                                 ? null
                                 : () => widget.onEditingComplete?.call(
-                                    controller.text,
-                                  ),
+                                      controller.text,
+                                    ),
                             // onTapOutside: widget.onTapOutside,
                             // onTapUpOutside: widget.onTapUpOutside,
                             forceLine: widget.forceLine,
@@ -707,8 +735,8 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
                                 widget.contentInsertionConfiguration,
                             contextMenuBuilder: widget.contextMenuBuilder,
                             spellCheckConfiguration: spellCheckConfiguration,
-                            magnifierConfiguration:
-                                widget.magnifierConfiguration ??
+                            magnifierConfiguration: widget
+                                    .magnifierConfiguration ??
                                 TextMagnifier.adaptiveMagnifierConfiguration,
                             hintLocales: widget.hintLocales,
                             textScaler: widget.textScaler,

@@ -48,29 +48,29 @@ class FlexibleEditableText extends InputBuilder {
     super.onFocusChanged,
     this.enabled = true,
     this.cursorColor,
-    this.textAlign = TextAlign.start,
+    this.textAlign = defaultTextAlign,
     bool? enableInteractiveSelection,
-    this.onTapAlwaysCalled = false,
-    this.readOnly = false,
+    this.onTapAlwaysCalled = defaultOnTapAlwaysCalled,
+    this.readOnly = defaultReadOnly,
     this.undoController,
     this.showCursor,
     this.onTap,
     this.scrollBehavior,
     this.textInputAction,
-    this.textCapitalization = TextCapitalization.none,
+    this.textCapitalization = defaultTextCapitalization,
     TextInputType? keyboardType,
     this.strutStyle,
-    this.autofocus = false,
+    this.autofocus = defaultAutofocus,
     this.textDirection,
-    this.obscuringCharacter = '•',
-    this.obscureText = false,
+    this.obscuringCharacter = defaultObscuringCharacter,
+    this.obscureText = defaultObscureText,
     this.maxLength,
     this.inputFormatters,
     this.maxLengthEnforcement,
     this.selectionControls,
     this.scrollController,
     this.cursorWidth,
-    this.maxLines = 1,
+    this.maxLines = defaultMaxLines,
     this.minLines,
     this.cursorRadius,
     this.cursorHeight,
@@ -78,25 +78,24 @@ class FlexibleEditableText extends InputBuilder {
     this.onEditingComplete,
     this.onSubmitted,
     this.autocorrect,
-    this.expands = false,
+    this.expands = defaultExpands,
     this.selectionHeightStyle,
     this.selectionWidthStyle,
-    this.enableSuggestions = true,
+    this.enableSuggestions = defaultEnableSuggestions,
     this.restorationId,
-    this.stylusHandwritingEnabled =
-        EditableText.defaultStylusHandwritingEnabled,
-    this.dragStartBehavior = DragStartBehavior.start,
+    this.stylusHandwritingEnabled = defaultStylusHandwritingEnabled,
+    this.dragStartBehavior = defaultDragStartBehavior,
     SmartDashesType? smartDashesType,
     SmartQuotesType? smartQuotesType,
-    this.canRequestFocus = true,
+    this.canRequestFocus = defaultCanRequestFocus,
     this.cursorOpacityAnimates,
     this.selectAllOnFocus,
-    this.autofillHints = const [],
+    this.autofillHints = defaultAutofillHints,
     this.keyboardAppearance,
-    this.groupId = EditableText,
+    this.groupId = defaultGroupId,
     this.spellCheckConfiguration,
-    this.enableIMEPersonalizedLearning = true,
-    this.clipBehavior = Clip.hardEdge,
+    this.enableIMEPersonalizedLearning = defaultEnableIMEPersonalizedLearning,
+    this.clipBehavior = defaultClipBehaviour,
     this.mouseCursor,
     this.contentInsertionConfiguration,
     this.hintLocales,
@@ -111,14 +110,14 @@ class FlexibleEditableText extends InputBuilder {
     this.selectionColor,
     this.locale,
     this.textHeightBehavior,
-    this.forceLine = true,
+    this.forceLine = defaultForceLine,
     this.selectionHitTestBehaviour,
-    this.textWidthBasis = TextWidthBasis.parent,
+    this.textWidthBasis = defaultTextWidthBasis,
     this.contextMenuBuilder = defaultContextMenuBuilder,
     this.scrollPhysics,
-    this.debug = false,
-    this.unfocusOnTapOutside = true,
-    this.scrollPadding = const EdgeInsets.all(20.0),
+    this.debug = defaultDebug,
+    this.unfocusOnTapOutside = defaultUnfocusOnTapOutside,
+    this.scrollPadding = defaultScrollPadding,
   })  : assert(obscuringCharacter.length == 1),
         smartDashesType = smartDashesType ??
             (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
@@ -153,6 +152,51 @@ class FlexibleEditableText extends InputBuilder {
             (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
         enableInteractiveSelection =
             enableInteractiveSelection ?? (!readOnly || !obscureText);
+
+  static const defaultScrollPadding = EdgeInsets.all(20);
+
+  static const defaultUnfocusOnTapOutside = true;
+
+  static const defaultTextWidthBasis = TextWidthBasis.parent;
+
+  static const defaultForceLine = true;
+
+  static const defaultDebug = false;
+
+  static const defaultClipBehaviour = Clip.hardEdge;
+
+  static const defaultEnableIMEPersonalizedLearning = true;
+
+  static const defaultGroupId = EditableText;
+
+  static const defaultDragStartBehavior = DragStartBehavior.start;
+
+  static const defaultStylusHandwritingEnabled =
+      EditableText.defaultStylusHandwritingEnabled;
+
+  static const defaultAutofocus = false;
+
+  static const defaultObscuringCharacter = '•';
+
+  static const Iterable<String> defaultAutofillHints = [];
+
+  static const defaultCanRequestFocus = true;
+
+  static const defaultEnableSuggestions = true;
+
+  static const defaultExpands = false;
+
+  static const defaultMaxLines = 1;
+
+  static const defaultObscureText = false;
+
+  static const defaultTextCapitalization = TextCapitalization.none;
+
+  static const defaultReadOnly = false;
+
+  static const defaultOnTapAlwaysCalled = false;
+
+  static const defaultTextAlign = TextAlign.start;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 
   final String? hintText;
   final TextStyle? hintStyle;
@@ -639,7 +683,7 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
                               handleDidLoseAccessibilityFocus,
                           onFocus: enabled
                               ? () {
-                                log('on focus start');
+                                  log('on focus start');
                                   assert(
                                     focusNode.canRequestFocus,
                                     'Received SemanticsAction.focus from the engine. However, the FocusNode '

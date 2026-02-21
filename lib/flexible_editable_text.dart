@@ -114,7 +114,7 @@ class FlexibleEditableText extends InputBuilder {
     this.forceLine = true,
     this.selectionHitTestBehaviour,
     this.textWidthBasis = TextWidthBasis.parent,
-    this.contextMenuBuilder = _defaultContextMenuBuilder,
+    this.contextMenuBuilder = defaultContextMenuBuilder,
     this.scrollPhysics,
     this.debug = false,
     this.unfocusOnTapOutside = true,
@@ -232,7 +232,7 @@ class FlexibleEditableText extends InputBuilder {
 
   bool get selectionEnabled => enableInteractiveSelection;
 
-  static Widget _defaultContextMenuBuilder(
+  static Widget defaultContextMenuBuilder(
     BuildContext context,
     EditableTextState editableTextState,
   ) {

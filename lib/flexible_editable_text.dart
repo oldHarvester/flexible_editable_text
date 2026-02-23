@@ -115,6 +115,7 @@ class FlexibleEditableText extends InputBuilder {
     this.textWidthBasis = defaultTextWidthBasis,
     this.contextMenuBuilder = defaultContextMenuBuilder,
     this.scrollPhysics,
+    this.overrideValue,
     this.debug = defaultDebug,
     this.unfocusOnTapOutside = defaultUnfocusOnTapOutside,
     this.scrollPadding = defaultScrollPadding,
@@ -196,7 +197,7 @@ class FlexibleEditableText extends InputBuilder {
 
   static const defaultOnTapAlwaysCalled = false;
 
-  static const defaultTextAlign = TextAlign.start;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+  static const defaultTextAlign = TextAlign.start;
 
   final String? hintText;
   final TextStyle? hintStyle;
@@ -273,6 +274,7 @@ class FlexibleEditableText extends InputBuilder {
       gestureDetectorBuilder;
   final bool unfocusOnTapOutside;
   final bool debug;
+  final String? overrideValue;
 
   bool get selectionEnabled => enableInteractiveSelection;
 
@@ -493,6 +495,7 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
   Widget build(BuildContext context) {
     VoidCallback? handleDidGainAccessibilityFocus;
     VoidCallback? handleDidLoseAccessibilityFocus;
+    final overrideValue = widget.overrideValue;
     final hintText = widget.hintText;
     final style = widget.style ?? DefaultTextStyle.of(context).style;
     final List<TextInputFormatter> formatters = <TextInputFormatter>[
@@ -713,95 +716,117 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
                                   }
                                 }
                               : null,
-                          child: EditableText(
-                            key: editableTextKey,
-                            readOnly: widget.readOnly || disabled,
-                            onSelectionChanged: _handleSelectionChanged,
-                            showCursor: widget.showCursor,
-                            showSelectionHandles: _showSelectionHandles,
-                            controller: controller,
-                            focusNode: focusNode,
-                            undoController: widget.undoController,
-                            keyboardType: widget.keyboardType,
-                            textInputAction: widget.textInputAction,
-                            textCapitalization: widget.textCapitalization,
-                            textAlign: widget.textAlign,
-                            style: style,
-                            cursorColor: cursorColor,
-                            strutStyle: widget.strutStyle,
-                            textDirection: widget.textDirection,
-                            autofocus: widget.autofocus,
-                            obscuringCharacter: widget.obscuringCharacter,
-                            obscureText: widget.obscureText,
-                            backgroundCursorColor: Colors.transparent,
-                            autocorrect: widget.autocorrect,
-                            smartDashesType: widget.smartDashesType,
-                            smartQuotesType: widget.smartQuotesType,
-                            enableSuggestions: widget.enableSuggestions,
-                            maxLines: widget.maxLines,
-                            minLines: widget.minLines,
-                            expands: widget.expands,
-                            selectionColor: hasFocus ? selectionColor : null,
-                            selectionControls:
-                                selectionEnabled ? textSelectionControls : null,
-                            onEditingComplete: widget.onEditingComplete == null
-                                ? null
-                                : () => widget.onEditingComplete?.call(
-                                      controller.text,
-                                    ),
-                            // onTapOutside: widget.onTapOutside,
-                            // onTapUpOutside: widget.onTapUpOutside,
-                            forceLine: widget.forceLine,
-                            locale: widget.locale,
-                            onSubmitted: widget.onSubmitted,
-                            onAppPrivateCommand: widget.onAppPrivateCommand,
-                            groupId: groupId,
-                            onSelectionHandleTapped:
-                                _handleSelectionHandleTapped,
-                            inputFormatters: formatters,
-                            rendererIgnoresPointer: true,
-                            mouseCursor:
-                                widget.mouseCursor ?? MouseCursor.defer,
-                            cursorWidth: cursorWidth,
-                            cursorHeight: widget.cursorHeight,
-                            cursorRadius: cursorRadius,
-                            selectionHeightStyle: widget.selectionHeightStyle,
-                            selectionWidthStyle: widget.selectionWidthStyle,
-                            cursorOpacityAnimates:
-                                cursorOpacityAnimates ?? false,
-                            cursorOffset: cursorOffset,
-                            paintCursorAboveText: paintCursorAboveText,
-                            scrollPadding: widget.scrollPadding,
-                            keyboardAppearance: keyboardAppearance,
-                            enableInteractiveSelection:
-                                widget.enableInteractiveSelection,
-                            selectAllOnFocus: widget.selectAllOnFocus,
-                            dragStartBehavior: widget.dragStartBehavior,
-                            scrollController: widget.scrollController,
-                            scrollPhysics: widget.scrollPhysics,
-                            autofillHints: widget.autofillHints,
-                            autofillClient: this,
-                            autocorrectionTextRectColor:
-                                autocorrectionTextRectColor,
-                            clipBehavior: widget.clipBehavior,
-                            restorationId: widget.restorationId,
-                            stylusHandwritingEnabled:
-                                widget.stylusHandwritingEnabled,
-                            enableIMEPersonalizedLearning:
-                                widget.enableIMEPersonalizedLearning,
-                            contentInsertionConfiguration:
-                                widget.contentInsertionConfiguration,
-                            contextMenuBuilder: widget.contextMenuBuilder,
-                            spellCheckConfiguration: spellCheckConfiguration,
-                            magnifierConfiguration: widget
-                                    .magnifierConfiguration ??
-                                TextMagnifier.adaptiveMagnifierConfiguration,
-                            hintLocales: widget.hintLocales,
-                            textScaler: widget.textScaler,
-                            scrollBehavior: widget.scrollBehavior,
-                            textHeightBehavior: widget.textHeightBehavior,
-                            textWidthBasis: widget.textWidthBasis,
-                          ),
+                          child: overrideValue != null
+                              ? Text(
+                                  overrideValue,
+                                  style: style,
+                                  textHeightBehavior: widget.textHeightBehavior,
+                                  textScaler: widget.textScaler,
+                                  textAlign: widget.textAlign,
+                                  locale: widget.locale,
+                                  maxLines: widget.maxLines,
+                                  textWidthBasis: widget.textWidthBasis,
+                                  selectionColor: widget.selectionColor,
+                                  strutStyle: widget.strutStyle,
+                                  textDirection: widget.textDirection,
+                                )
+                              : EditableText(
+                                  key: editableTextKey,
+                                  readOnly: widget.readOnly || disabled,
+                                  onSelectionChanged: _handleSelectionChanged,
+                                  showCursor: widget.showCursor,
+                                  showSelectionHandles: _showSelectionHandles,
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  undoController: widget.undoController,
+                                  keyboardType: widget.keyboardType,
+                                  textInputAction: widget.textInputAction,
+                                  textCapitalization: widget.textCapitalization,
+                                  textAlign: widget.textAlign,
+                                  style: style,
+                                  cursorColor: cursorColor,
+                                  strutStyle: widget.strutStyle,
+                                  textDirection: widget.textDirection,
+                                  autofocus: widget.autofocus,
+                                  obscuringCharacter: widget.obscuringCharacter,
+                                  obscureText: widget.obscureText,
+                                  backgroundCursorColor: Colors.transparent,
+                                  autocorrect: widget.autocorrect,
+                                  smartDashesType: widget.smartDashesType,
+                                  smartQuotesType: widget.smartQuotesType,
+                                  enableSuggestions: widget.enableSuggestions,
+                                  maxLines: widget.maxLines,
+                                  minLines: widget.minLines,
+                                  expands: widget.expands,
+                                  selectionColor:
+                                      hasFocus ? selectionColor : null,
+                                  selectionControls: selectionEnabled
+                                      ? textSelectionControls
+                                      : null,
+                                  onEditingComplete: widget.onEditingComplete ==
+                                          null
+                                      ? null
+                                      : () => widget.onEditingComplete?.call(
+                                            controller.text,
+                                          ),
+                                  // onTapOutside: widget.onTapOutside,
+                                  // onTapUpOutside: widget.onTapUpOutside,
+                                  forceLine: widget.forceLine,
+                                  locale: widget.locale,
+                                  onSubmitted: widget.onSubmitted,
+                                  onAppPrivateCommand:
+                                      widget.onAppPrivateCommand,
+                                  groupId: groupId,
+                                  onSelectionHandleTapped:
+                                      _handleSelectionHandleTapped,
+                                  inputFormatters: formatters,
+                                  rendererIgnoresPointer: true,
+                                  mouseCursor:
+                                      widget.mouseCursor ?? MouseCursor.defer,
+                                  cursorWidth: cursorWidth,
+                                  cursorHeight: widget.cursorHeight,
+                                  cursorRadius: cursorRadius,
+                                  selectionHeightStyle:
+                                      widget.selectionHeightStyle,
+                                  selectionWidthStyle:
+                                      widget.selectionWidthStyle,
+                                  cursorOpacityAnimates:
+                                      cursorOpacityAnimates ?? false,
+                                  cursorOffset: cursorOffset,
+                                  paintCursorAboveText: paintCursorAboveText,
+                                  scrollPadding: widget.scrollPadding,
+                                  keyboardAppearance: keyboardAppearance,
+                                  enableInteractiveSelection:
+                                      widget.enableInteractiveSelection,
+                                  selectAllOnFocus: widget.selectAllOnFocus,
+                                  dragStartBehavior: widget.dragStartBehavior,
+                                  scrollController: widget.scrollController,
+                                  scrollPhysics: widget.scrollPhysics,
+                                  autofillHints: widget.autofillHints,
+                                  autofillClient: this,
+                                  autocorrectionTextRectColor:
+                                      autocorrectionTextRectColor,
+                                  clipBehavior: widget.clipBehavior,
+                                  restorationId: widget.restorationId,
+                                  stylusHandwritingEnabled:
+                                      widget.stylusHandwritingEnabled,
+                                  enableIMEPersonalizedLearning:
+                                      widget.enableIMEPersonalizedLearning,
+                                  contentInsertionConfiguration:
+                                      widget.contentInsertionConfiguration,
+                                  contextMenuBuilder: widget.contextMenuBuilder,
+                                  spellCheckConfiguration:
+                                      spellCheckConfiguration,
+                                  magnifierConfiguration:
+                                      widget.magnifierConfiguration ??
+                                          TextMagnifier
+                                              .adaptiveMagnifierConfiguration,
+                                  hintLocales: widget.hintLocales,
+                                  textScaler: widget.textScaler,
+                                  scrollBehavior: widget.scrollBehavior,
+                                  textHeightBehavior: widget.textHeightBehavior,
+                                  textWidthBasis: widget.textWidthBasis,
+                                ),
                         ),
                       ],
                     );

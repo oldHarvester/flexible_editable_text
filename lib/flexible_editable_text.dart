@@ -117,6 +117,8 @@ class FlexibleEditableText extends InputBuilder {
     this.scrollPhysics,
     this.overrideValue,
     this.debug = defaultDebug,
+    this.handleDidGainAccessibilityFocus,
+    this.handleDidLoseAccessibilityFocus,
     this.unfocusOnTapOutside = defaultUnfocusOnTapOutside,
     this.scrollPadding = defaultScrollPadding,
   })  : assert(obscuringCharacter.length == 1),
@@ -275,6 +277,8 @@ class FlexibleEditableText extends InputBuilder {
   final bool unfocusOnTapOutside;
   final bool debug;
   final String? overrideValue;
+  final VoidCallback? handleDidLoseAccessibilityFocus;
+  final VoidCallback? handleDidGainAccessibilityFocus;
 
   bool get selectionEnabled => enableInteractiveSelection;
 
@@ -493,8 +497,10 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
 
   @override
   Widget build(BuildContext context) {
-    VoidCallback? handleDidGainAccessibilityFocus;
-    VoidCallback? handleDidLoseAccessibilityFocus;
+    VoidCallback? handleDidGainAccessibilityFocus =
+        widget.handleDidGainAccessibilityFocus;
+    VoidCallback? handleDidLoseAccessibilityFocus =
+        widget.handleDidLoseAccessibilityFocus;
     final overrideValue = widget.overrideValue;
     final hintText = widget.hintText;
     final style = widget.style ?? DefaultTextStyle.of(context).style;
@@ -571,13 +577,13 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
           0,
         );
         paintCursorAboveText = true;
-        handleDidGainAccessibilityFocus = () {
+        handleDidGainAccessibilityFocus ??= () {
           // Automatically activate the TextField when it receives accessibility focus.
           if (!focusNode.hasFocus && focusNode.canRequestFocus) {
             focusNode.requestFocus();
           }
         };
-        handleDidLoseAccessibilityFocus = () {
+        handleDidLoseAccessibilityFocus ??= () {
           focusNode.unfocus();
         };
         break;
@@ -594,13 +600,13 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
         cursorOpacityAnimates ??= false;
         textSelectionControls ??= desktopTextSelectionHandleControls;
         paintCursorAboveText = false;
-        handleDidGainAccessibilityFocus = () {
+        handleDidGainAccessibilityFocus ??= () {
           // Automatically activate the TextField when it receives accessibility focus.
           if (!focusNode.hasFocus && focusNode.canRequestFocus) {
             focusNode.requestFocus();
           }
         };
-        handleDidLoseAccessibilityFocus = () {
+        handleDidLoseAccessibilityFocus ??= () {
           focusNode.unfocus();
         };
         break;
@@ -609,13 +615,13 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
         cursorOpacityAnimates ??= false;
         textSelectionControls ??= desktopTextSelectionHandleControls;
         paintCursorAboveText = false;
-        handleDidGainAccessibilityFocus = () {
+        handleDidGainAccessibilityFocus ??= () {
           // Automatically activate the TextField when it receives accessibility focus.
           if (!focusNode.hasFocus && focusNode.canRequestFocus) {
             focusNode.requestFocus();
           }
         };
-        handleDidLoseAccessibilityFocus = () {
+        handleDidLoseAccessibilityFocus ??= () {
           focusNode.unfocus();
         };
         break;
@@ -635,7 +641,9 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
     return TapRegion(
       groupId: groupId,
       onTapOutside: (event) {
-        focusNode.unfocus();
+        if (widget.unfocusOnTapOutside) {
+          focusNode.unfocus();
+        }
         widget.onTapOutside?.call(event);
       },
       onTapUpOutside: (event) {

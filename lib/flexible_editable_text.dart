@@ -661,9 +661,12 @@ class _FlexibleEditableTextState extends InputBuilderState<FlexibleEditableText>
                 return ValueListenableBuilder(
                   valueListenable: _isEmpty,
                   builder: (context, isEmpty, child) {
+                    final hideHint = overrideValue != null
+                        ? overrideValue.hasContent
+                        : !isEmpty;
                     return Stack(
                       children: [
-                        if (hintText != null && isEmpty)
+                        if (!hideHint && hintText != null)
                           Positioned.fill(
                             child: Text(
                               hintText,
